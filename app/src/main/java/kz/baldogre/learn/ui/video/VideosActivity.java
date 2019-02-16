@@ -48,7 +48,7 @@ public class VideosActivity extends YouTubeBaseActivity {
 
     private SharedPreferences sharedPreferences;
     int index = 0;
-    int currentMillis;
+    int currentMillis[] = new int[links.length];
     int lastViewedLesson = 0;
 
     @Override
@@ -59,16 +59,49 @@ public class VideosActivity extends YouTubeBaseActivity {
 
         sharedPreferences = getSharedPreferences("Learn", MODE_PRIVATE);
         index = sharedPreferences.getInt(Const.CURRENT_LESSON, 0);
-        currentMillis = sharedPreferences.getInt(Const.CURRENT_MILLISECONDS, 0);
+        for (int i = 0; i < currentMillis.length; i++) {
+            currentMillis[i] = sharedPreferences.getInt(Const.CURRENT_MILLISECONDS + i, 0);
+        }
         lastViewedLesson = index;
         youTubePlayerView.initialize(DeveloperKey.KEY, new YouTubePlayer.OnInitializedListener() {
             @Override
-            public void onInitializationSuccess(YouTubePlayer.Provider provider, YouTubePlayer youTubePlayer, boolean b) {
+            public void onInitializationSuccess(YouTubePlayer.Provider provider, YouTubePlayer youTubePlayer, boolean restored) {
                 mYouTubePlayer = youTubePlayer;
-                mYouTubePlayer.loadVideo(links[index]);
-                description.setText(descriptions[index]);
-                mYouTubePlayer.seekToMillis(currentMillis);
-                mYouTubePlayer.setPlayerStyle(YouTubePlayer.PlayerStyle.CHROMELESS);
+                if (!restored) {
+                    description.setText(descriptions[index]);
+                    mYouTubePlayer.setPlayerStyle(YouTubePlayer.PlayerStyle.CHROMELESS);
+                    mYouTubePlayer.loadVideo(links[index]);
+                }
+                mYouTubePlayer.setPlayerStateChangeListener(new YouTubePlayer.PlayerStateChangeListener() {
+                    @Override
+                    public void onLoading() {
+
+                    }
+
+                    @Override
+                    public void onLoaded(String s) {
+//                        mYouTubePlayer.seekToMillis(currentMillis);
+                    }
+
+                    @Override
+                    public void onAdStarted() {
+
+                    }
+
+                    @Override
+                    public void onVideoStarted() {
+                    }
+
+                    @Override
+                    public void onVideoEnded() {
+
+                    }
+
+                    @Override
+                    public void onError(YouTubePlayer.ErrorReason errorReason) {
+
+                    }
+                });
             }
 
             @Override
@@ -82,10 +115,15 @@ public class VideosActivity extends YouTubeBaseActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        sharedPreferences.edit()
-                .putInt(Const.CURRENT_LESSON, index)
-                .putInt(Const.CURRENT_MILLISECONDS, mYouTubePlayer.getCurrentTimeMillis())
-                .apply();
+        if (currentMillis[index] < mYouTubePlayer.getCurrentTimeMillis()) {
+            currentMillis[index] = mYouTubePlayer.getCurrentTimeMillis();
+        }
+        SharedPreferences.Editor editor = sharedPreferences.edit()
+                .putInt(Const.CURRENT_LESSON, index);
+        for (int i = 0; i < currentMillis.length; i++) {
+            editor.putInt(Const.CURRENT_MILLISECONDS + i, currentMillis[i]);
+        }
+        editor.apply();
     }
 
     @OnClick(R.id.pause)
@@ -93,6 +131,11 @@ public class VideosActivity extends YouTubeBaseActivity {
         if (mYouTubePlayer.isPlaying()) {
             mYouTubePlayer.pause();
             ((ImageButton) v).setImageResource(R.drawable.ic_pause_black_24dp);
+
+            sharedPreferences.edit()
+                    .putInt(Const.CURRENT_LESSON, index)
+                    .putInt(Const.CURRENT_MILLISECONDS + index, mYouTubePlayer.getCurrentTimeMillis())
+                    .apply();
         } else {
             mYouTubePlayer.play();
             ((ImageButton) v).setImageResource(R.drawable.ic_play_arrow_black_24dp);
@@ -110,12 +153,15 @@ public class VideosActivity extends YouTubeBaseActivity {
 
     @OnClick(R.id.next)
     public void onNextClick(View v) {
-        if (index < links.length - 1 && mYouTubePlayer.getDurationMillis() == mYouTubePlayer.getCurrentTimeMillis() && index < lastViewedLesson) {
+        currentMillis[index] = mYouTubePlayer.getCurrentTimeMillis();
+        if (index < links.length - 1 &&
+                (mYouTubePlayer.getDurationMillis() <= currentMillis[index]
+                        || index < lastViewedLesson)) {
             mYouTubePlayer.loadVideo(links[++index]);
             description.setText(descriptions[index]);
             pause.setImageResource(R.drawable.ic_play_arrow_black_24dp);
             lastViewedLesson = index;
-        } else if (mYouTubePlayer.getDurationMillis() < mYouTubePlayer.getCurrentTimeMillis()) {
+        } else if (mYouTubePlayer.getDurationMillis() > mYouTubePlayer.getCurrentTimeMillis()) {
             Toast.makeText(this, R.string.error_next_lesson, Toast.LENGTH_SHORT).show();
         }
     }
