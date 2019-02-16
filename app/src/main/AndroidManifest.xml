@@ -17,10 +17,10 @@
         tools:replace="android:appComponentFactory">
 
         <activity
-            android:name=".VideosActivity"
+            android:name=".ui.video.VideosActivity"
             android:label="@string/app_name" />
 
-        <activity android:name=".MainActivity">
+        <activity android:name=".ui.main.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

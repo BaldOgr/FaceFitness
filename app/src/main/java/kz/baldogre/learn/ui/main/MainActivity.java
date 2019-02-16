@@ -1,4 +1,4 @@
-package kz.baldogre.learn;
+package kz.baldogre.learn.ui.main;
 
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
@@ -6,6 +6,8 @@ import android.os.Bundle;
 
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import kz.baldogre.learn.R;
+import kz.baldogre.learn.ui.video.VideosActivity;
 
 public class MainActivity extends AppCompatActivity {
 
