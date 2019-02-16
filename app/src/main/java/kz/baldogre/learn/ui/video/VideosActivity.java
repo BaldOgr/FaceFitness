@@ -1,7 +1,9 @@
 package kz.baldogre.learn.ui.video;
 
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
+import android.text.Html;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -21,18 +23,11 @@ import kz.baldogre.learn.common.Const;
 
 public class VideosActivity extends YouTubeBaseActivity {
 
-    public static String[] links = {
-            "yctelnfigHc",
+    public static final String[] links = {
+            "NmFhSFHfQWk",
             "OhLavbEdqmk",
             "iX4pqNK_0T4",
             "-dH-xU4CSJY"
-    };
-
-    public static String[] descriptions = {
-            "Лекция 1. Введение в архитектуру клиент-серверных андроид-приложений",
-            "Лекция 2 по архитектуре андроид-приложений. Паттерны A/B/C",
-            "Лекция 3 по архитектуре андроид приложения. Знакомство с RxJava",
-            "Стоит ли учить Scala и Kotlin?"
     };
 
     @BindView(R.id.youtube_player)
@@ -68,40 +63,10 @@ public class VideosActivity extends YouTubeBaseActivity {
             public void onInitializationSuccess(YouTubePlayer.Provider provider, YouTubePlayer youTubePlayer, boolean restored) {
                 mYouTubePlayer = youTubePlayer;
                 if (!restored) {
-                    description.setText(descriptions[index]);
+                    setDescription();
                     mYouTubePlayer.setPlayerStyle(YouTubePlayer.PlayerStyle.CHROMELESS);
                     mYouTubePlayer.loadVideo(links[index]);
                 }
-                mYouTubePlayer.setPlayerStateChangeListener(new YouTubePlayer.PlayerStateChangeListener() {
-                    @Override
-                    public void onLoading() {
-
-                    }
-
-                    @Override
-                    public void onLoaded(String s) {
-//                        mYouTubePlayer.seekToMillis(currentMillis);
-                    }
-
-                    @Override
-                    public void onAdStarted() {
-
-                    }
-
-                    @Override
-                    public void onVideoStarted() {
-                    }
-
-                    @Override
-                    public void onVideoEnded() {
-
-                    }
-
-                    @Override
-                    public void onError(YouTubePlayer.ErrorReason errorReason) {
-
-                    }
-                });
             }
 
             @Override
@@ -110,6 +75,16 @@ public class VideosActivity extends YouTubeBaseActivity {
             }
         });
 
+    }
+
+    private void setDescription() {
+        int id = R.string.app_name;
+        switch (index) {
+            case 0:
+                id = R.string.description_0;
+
+        }
+        description.setText(id);
     }
 
     @Override
@@ -146,7 +121,7 @@ public class VideosActivity extends YouTubeBaseActivity {
     public void onPreviousClick(View v) {
         if (index > 0) {
             mYouTubePlayer.loadVideo(links[--index]);
-            description.setText(descriptions[index]);
+            setDescription();
             pause.setImageResource(R.drawable.ic_play_arrow_black_24dp);
         }
     }
@@ -158,7 +133,7 @@ public class VideosActivity extends YouTubeBaseActivity {
                 (mYouTubePlayer.getDurationMillis() <= currentMillis[index]
                         || index < lastViewedLesson)) {
             mYouTubePlayer.loadVideo(links[++index]);
-            description.setText(descriptions[index]);
+            setDescription();
             pause.setImageResource(R.drawable.ic_play_arrow_black_24dp);
             lastViewedLesson = index;
         } else if (mYouTubePlayer.getDurationMillis() > mYouTubePlayer.getCurrentTimeMillis()) {
