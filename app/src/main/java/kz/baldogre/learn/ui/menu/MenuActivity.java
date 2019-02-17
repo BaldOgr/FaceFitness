@@ -40,7 +40,7 @@ public class MenuActivity extends AppCompatActivity {
                 .setTitle(R.string.instagram_title)
                 .setMessage(R.string.instagram_message)
                 .setPositiveButton(R.string.ok, (dialog, which) -> {
-                    Uri uri = Uri.parse("http://instagram.com/");
+                    Uri uri = Uri.parse("http://instagram.com/facefitness_universe");
                     Intent likeIng = new Intent(Intent.ACTION_VIEW, uri);
 
                     likeIng.setPackage("com.instagram.android");
@@ -49,7 +49,7 @@ public class MenuActivity extends AppCompatActivity {
                         startActivity(likeIng);
                     } catch (ActivityNotFoundException e) {
                         startActivity(new Intent(Intent.ACTION_VIEW,
-                                Uri.parse("http://instagram.com/")));
+                                Uri.parse("http://instagram.com/facefitness_universe")));
                     }
                 })
                 .setNegativeButton(R.string.no, (dialog, which) -> {

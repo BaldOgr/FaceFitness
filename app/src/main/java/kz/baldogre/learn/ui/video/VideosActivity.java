@@ -1,6 +1,5 @@
 package kz.baldogre.learn.ui.video;
 
-import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
@@ -22,7 +21,6 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import kz.baldogre.learn.App;
 import kz.baldogre.learn.R;
-import kz.baldogre.learn.common.Const;
 import kz.baldogre.learn.common.DeveloperKey;
 import kz.baldogre.learn.common.RunOnBackground;
 import kz.baldogre.learn.model.LastViewedLesson;
@@ -126,9 +124,7 @@ public class VideosActivity extends YouTubeBaseActivity {
         if (lessons.get(index).getCurrentMillis() < mYouTubePlayer.getCurrentTimeMillis()) {
             lessons.get(index).setCurrentMillis(mYouTubePlayer.getCurrentTimeMillis());
         }
-        RunOnBackground.runOnBackground(() -> {
-            appDatabase.getLessonDao().insert(lessons.get(index));
-        });
+        RunOnBackground.runOnBackground(() -> appDatabase.getLessonDao().insert(lessons.get(index)));
     }
 
     @OnClick({R.id.pause})
@@ -145,9 +141,7 @@ public class VideosActivity extends YouTubeBaseActivity {
 
     private void saveCurrentMillis() {
         lessons.get(index).setCurrentMillis(mYouTubePlayer.getCurrentTimeMillis());
-        RunOnBackground.runOnBackground(() -> {
-            appDatabase.getLessonDao().insert(lessons.get(index));
-        });
+        RunOnBackground.runOnBackground(() -> appDatabase.getLessonDao().insert(lessons.get(index)));
     }
 
     @OnClick(R.id.previous)
