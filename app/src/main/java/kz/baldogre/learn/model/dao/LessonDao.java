@@ -24,4 +24,7 @@ public interface LessonDao {
 
     @Query("SELECT * FROM Lesson")
     List<Lesson> getAllLessons();
+
+    @Query("SELECT * FROM Lesson WHERE courseId = :courseId")
+    List<Lesson> getLessonsByCourseId(int courseId);
 }

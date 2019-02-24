@@ -7,6 +7,7 @@ import android.arch.persistence.room.PrimaryKey;
 public class Lesson {
     @PrimaryKey
     private int id;
+    private int courseId;
     private String description;
     private String link;
     private int currentMillis = 0;
@@ -18,6 +19,14 @@ public class Lesson {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public int getCourseId() {
+        return courseId;
+    }
+
+    public void setCourseId(int courseId) {
+        this.courseId = courseId;
     }
 
     public String getDescription() {

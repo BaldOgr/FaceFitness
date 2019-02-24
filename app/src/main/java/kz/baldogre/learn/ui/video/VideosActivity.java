@@ -28,6 +28,9 @@ import kz.baldogre.learn.model.Lesson;
 import kz.baldogre.learn.model.db.AppDatabase;
 
 public class VideosActivity extends YouTubeBaseActivity {
+    public static final String COURSE_ID = "course_id";
+
+
     @BindView(R.id.youtube_player)
     YouTubePlayerView youTubePlayerView;
 
@@ -50,64 +53,78 @@ public class VideosActivity extends YouTubeBaseActivity {
         setContentView(R.layout.activity_videos);
         ButterKnife.bind(this);
 
-
         appDatabase = ((App) getApplicationContext()).getAppDatabase();
 
-        RunOnBackground.runOnBackground(() -> {
-            lessons = appDatabase.getLessonDao().getAllLessons();
-            lastViewedLesson = appDatabase.getLastViewedDao().getLastViewedLesson();
-            index = lastViewedLesson.getLessonId();
-            runOnUiThread(() -> {
-                youTubePlayerView.initialize(DeveloperKey.KEY, new YouTubePlayer.OnInitializedListener() {
+        RunOnBackground.runOnBackground(new Runnable() {
+            @Override
+            public void run() {
+
+                int courseId = getIntent().getIntExtra(COURSE_ID, 0);
+                lessons = appDatabase.getLessonDao().getLessonsByCourseId(courseId);
+                lastViewedLesson = appDatabase.getLastViewedDao().getLastViewedLesson();
+                if (lastViewedLesson == null) {
+                    index = 0;
+                    lastViewedLesson = new LastViewedLesson();
+                } else {
+                    if (lastViewedLesson.getCourseId() == courseId)
+                        index = lastViewedLesson.getLessonId();
+                    else index = 0;
+                }
+                runOnUiThread(new Runnable() {
                     @Override
-                    public void onInitializationSuccess(YouTubePlayer.Provider provider, YouTubePlayer youTubePlayer, boolean restored) {
-                        mYouTubePlayer = youTubePlayer;
-                        setDescription();
-                        if (!restored) {
-                            mYouTubePlayer.loadVideo(lessons.get(index).getLink());
-                        }
-                        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                            mYouTubePlayer.setPlayerStyle(YouTubePlayer.PlayerStyle.MINIMAL);
-                        } else {
-                            mYouTubePlayer.setPlayerStyle(YouTubePlayer.PlayerStyle.CHROMELESS);
-                        }
-                        mYouTubePlayer.setPlaybackEventListener(new YouTubePlayer.PlaybackEventListener() {
+                    public void run() {
+                        youTubePlayerView.initialize(DeveloperKey.KEY, new YouTubePlayer.OnInitializedListener() {
                             @Override
-                            public void onPlaying() {
+                            public void onInitializationSuccess(YouTubePlayer.Provider provider, YouTubePlayer youTubePlayer, boolean restored) {
+                                mYouTubePlayer = youTubePlayer;
+                                setDescription();
+                                if (!restored) {
+                                    mYouTubePlayer.loadVideo(lessons.get(index).getLink());
+                                }
+                                if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                                    mYouTubePlayer.setPlayerStyle(YouTubePlayer.PlayerStyle.MINIMAL);
+                                } else {
+                                    mYouTubePlayer.setPlayerStyle(YouTubePlayer.PlayerStyle.CHROMELESS);
+                                }
+                                mYouTubePlayer.setPlaybackEventListener(new YouTubePlayer.PlaybackEventListener() {
+                                    @Override
+                                    public void onPlaying() {
 //                                onPausePlayClick(pause);
+                                    }
+
+                                    @Override
+                                    public void onPaused() {
+                                        saveCurrentMillis();
+                                    }
+
+                                    @Override
+                                    public void onStopped() {
+
+                                    }
+
+                                    @Override
+                                    public void onBuffering(boolean b) {
+
+                                    }
+
+                                    @Override
+                                    public void onSeekTo(int i) {
+
+                                    }
+                                });
                             }
 
                             @Override
-                            public void onPaused() {
-                                saveCurrentMillis();
-                            }
-
-                            @Override
-                            public void onStopped() {
-
-                            }
-
-                            @Override
-                            public void onBuffering(boolean b) {
-
-                            }
-
-                            @Override
-                            public void onSeekTo(int i) {
-
+                            public void onInitializationFailure(YouTubePlayer.Provider provider, YouTubeInitializationResult youTubeInitializationResult) {
+                                youTubeInitializationResult.getErrorDialog(VideosActivity.this, 1).show();
                             }
                         });
                     }
-
-                    @Override
-                    public void onInitializationFailure(YouTubePlayer.Provider provider, YouTubeInitializationResult youTubeInitializationResult) {
-                        youTubeInitializationResult.getErrorDialog(VideosActivity.this, 1).show();
-                    }
                 });
-            });
+
+            }
+
         });
-
-
     }
 
     private void setDescription() {
@@ -155,9 +172,12 @@ public class VideosActivity extends YouTubeBaseActivity {
 
     @OnClick(R.id.next)
     public void onNextClick(View v) {
+        if (lessons.get(index).getCurrentMillis() < mYouTubePlayer.getCurrentTimeMillis())
+            lessons.get(index).setCurrentMillis(mYouTubePlayer.getCurrentTimeMillis());
+
         if (index < lessons.size() - 1 &&
-                (mYouTubePlayer.getDurationMillis() >= lessons.get(index).getCurrentMillis()
-                        || index < lastViewedLesson.getLessonId())) {
+                (mYouTubePlayer.getDurationMillis() <= lessons.get(index).getCurrentMillis()
+                        && index < lastViewedLesson.getLessonId())) {
             mYouTubePlayer.loadVideo(lessons.get(++index).getLink());
             setDescription();
             pause.setImageResource(R.drawable.ic_play_arrow_black_24dp);
