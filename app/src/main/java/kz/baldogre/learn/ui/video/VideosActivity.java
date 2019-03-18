@@ -187,9 +187,9 @@ public class VideosActivity extends YouTubeBaseActivity {
             RunOnBackground.runOnBackground(() -> {
                 appDatabase.getLastViewedDao().insert(lastViewedLesson);
             });
-            if (index == lessons.size() - 1) {
-                startActivity(new Intent(this, BadgesActivity.class));
-            }
+//            if (index == lessons.size() - 1) {
+//                startActivity(new Intent(this, BadgesActivity.class));
+//            }
         } else if (index == lessons.size() - 1) {
             Toast.makeText(this, R.string.error_not_enough_lessons, Toast.LENGTH_SHORT).show();
         } else if (mYouTubePlayer.getDurationMillis() > mYouTubePlayer.getCurrentTimeMillis()) {
