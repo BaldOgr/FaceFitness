@@ -6,17 +6,8 @@ import android.arch.persistence.room.PrimaryKey;
 @Entity
 public class LastViewedLesson {
     @PrimaryKey
-    private int id = 0;
-    private int lessonId = 0;
     private int courseId = 0;
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
+    private int lessonId = 0;
 
     public int getLessonId() {
         return lessonId;

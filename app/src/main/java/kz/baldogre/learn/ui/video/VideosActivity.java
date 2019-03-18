@@ -1,5 +1,6 @@
 package kz.baldogre.learn.ui.video;
 
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
@@ -61,10 +62,11 @@ public class VideosActivity extends YouTubeBaseActivity {
 
                 int courseId = getIntent().getIntExtra(COURSE_ID, 0);
                 lessons = appDatabase.getLessonDao().getLessonsByCourseId(courseId);
-                lastViewedLesson = appDatabase.getLastViewedDao().getLastViewedLesson();
+                lastViewedLesson = appDatabase.getLastViewedDao().getLastViewedLessonByCourseId(courseId);
                 if (lastViewedLesson == null) {
                     index = 0;
                     lastViewedLesson = new LastViewedLesson();
+                    lastViewedLesson.setCourseId(courseId);
                 } else {
                     if (lastViewedLesson.getCourseId() == courseId)
                         index = lastViewedLesson.getLessonId();
@@ -177,7 +179,7 @@ public class VideosActivity extends YouTubeBaseActivity {
 
         if (index < lessons.size() - 1 &&
                 (mYouTubePlayer.getDurationMillis() <= lessons.get(index).getCurrentMillis()
-                        && index < lastViewedLesson.getLessonId())) {
+                        || index < lastViewedLesson.getLessonId())) {
             mYouTubePlayer.loadVideo(lessons.get(++index).getLink());
             setDescription();
             pause.setImageResource(R.drawable.ic_play_arrow_black_24dp);
@@ -185,6 +187,9 @@ public class VideosActivity extends YouTubeBaseActivity {
             RunOnBackground.runOnBackground(() -> {
                 appDatabase.getLastViewedDao().insert(lastViewedLesson);
             });
+            if (index == lessons.size() - 1) {
+                startActivity(new Intent(this, BadgesActivity.class));
+            }
         } else if (index == lessons.size() - 1) {
             Toast.makeText(this, R.string.error_not_enough_lessons, Toast.LENGTH_SHORT).show();
         } else if (mYouTubePlayer.getDurationMillis() > mYouTubePlayer.getCurrentTimeMillis()) {

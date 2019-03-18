@@ -68,7 +68,7 @@ public class PlaceholderFragment extends Fragment {
             RunOnBackground.runOnBackground(new Runnable() {
                 @Override
                 public void run() {
-                    course = ((App) getActivity().getApplication()).getAppDatabase().getCourseDao().getCourseById(finalSection - 1);
+                    course = ((App) getActivity().getApplication()).getAppDatabase().getCourseDao().getCourseById(finalSection);
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
