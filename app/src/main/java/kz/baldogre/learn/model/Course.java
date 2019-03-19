@@ -11,6 +11,7 @@ public class Course {
     @PrimaryKey
     private int id;
     private String description;
+    private boolean isOpen = false;
     @Embedded
     private ArrayList<Lesson> lessons;
 
@@ -36,5 +37,13 @@ public class Course {
 
     public void setLessons(ArrayList<Lesson> lessons) {
         this.lessons = lessons;
+    }
+
+    public boolean isOpen() {
+        return isOpen;
+    }
+
+    public void setOpen(boolean open) {
+        isOpen = open;
     }
 }

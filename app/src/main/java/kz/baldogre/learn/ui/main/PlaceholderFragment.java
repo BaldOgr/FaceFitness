@@ -12,10 +12,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import kz.baldogre.learn.App;
+import kz.baldogre.learn.BuildConfig;
 import kz.baldogre.learn.R;
 import kz.baldogre.learn.common.RunOnBackground;
 import kz.baldogre.learn.model.Course;
@@ -77,12 +79,12 @@ public class PlaceholderFragment extends Fragment {
                             } else {
                                 mLessonText.setText(Html.fromHtml(course.getDescription().replaceAll("\n", "<br />")));
                             }
-                            mStartLessons.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    startActivity(new Intent(getContext(), VideosActivity.class).putExtra(VideosActivity.COURSE_ID, course.getId()));
-                                }
-                            });
+                            if (course.isOpen() || BuildConfig.DEBUG) {
+                                mStartLessons.setOnClickListener(v -> startActivity(new Intent(getContext(), VideosActivity.class).putExtra(VideosActivity.COURSE_ID, course.getId())));
+                            } else {
+                                mStartLessons.setOnClickListener(v -> Toast.makeText(getContext(), R.string.error_closed_course, Toast.LENGTH_SHORT).show());
+                                
+                            }
                         }
                     });
                 }

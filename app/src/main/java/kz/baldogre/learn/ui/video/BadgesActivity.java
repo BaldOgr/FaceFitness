@@ -1,13 +1,11 @@
 package kz.baldogre.learn.ui.video;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.widget.TextView;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import io.reactivex.functions.Consumer;
-import io.reactivex.schedulers.Schedulers;
 import kz.baldogre.learn.App;
 import kz.baldogre.learn.R;
 import kz.baldogre.learn.model.Badge;
@@ -22,18 +20,19 @@ public class BadgesActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_badges);
         ButterKnife.bind(this);
-        ((App) getApplication()).getAppDatabase().getBadgeDao().getBadge()
-                .subscribeOn(Schedulers.io())
-                .subscribe(new Consumer<Badge>() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Badge badge = ((App) getApplication()).getAppDatabase().getBadgeDao().getBadge();
+                runOnUiThread(new Runnable() {
                     @Override
-                    public void accept(Badge badge) throws Exception {
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                mBadges.setText("Badges:" + badge.getCount());
-                            }
-                        });
+                    public void run() {
+                        mBadges.setText("Badges:" + badge.getCount());
                     }
                 });
+            }
+        }).start();
+
+
     }
 }

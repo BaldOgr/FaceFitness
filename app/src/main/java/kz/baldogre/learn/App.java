@@ -3,16 +3,13 @@ package kz.baldogre.learn;
 import android.annotation.SuppressLint;
 import android.app.Application;
 import android.arch.persistence.room.Room;
-import android.content.Context;
 import android.content.SharedPreferences;
 
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.List;
 
-import io.reactivex.Completable ;
-import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Consumer;
+import io.reactivex.Completable;
 import io.reactivex.schedulers.Schedulers;
 import kz.baldogre.learn.common.Const;
 import kz.baldogre.learn.model.Badge;
@@ -26,6 +23,7 @@ public class App extends Application {
     AppDatabase appDatabase;
     private static int DB_VERSION = Const.CURRENT_DB_VERSION;
 
+    @SuppressLint("CheckResult")
     @Override
     public void onCreate() {
         super.onCreate();
@@ -35,6 +33,13 @@ public class App extends Application {
                 .build();
 
         SharedPreferences sharedPreferences = getSharedPreferences("Lesson", MODE_PRIVATE);
+
+        if (!sharedPreferences.contains("badges")) {
+            addFirstBadge();
+            sharedPreferences.edit()
+                    .putBoolean("badges", true)
+                    .apply();
+        }
 
         if (sharedPreferences.getInt("DB_VERSION", -1) != DB_VERSION) {
             new Thread(() -> {
@@ -58,6 +63,11 @@ public class App extends Application {
         } else {
             appDatabase.getLastOpenAppDao().getLastOpenApp().subscribeOn(Schedulers.io())
                     .subscribe(lastOpenApp -> {
+                        if (lastOpenApp == null) {
+                            addBadge();
+                            return;
+                        }
+
                         int dayOfMonth = Calendar.getInstance().get(Calendar.DAY_OF_MONTH);
 
                         LastOpenApp todayOpen = new LastOpenApp();
@@ -70,25 +80,33 @@ public class App extends Application {
                         } else if (todayOpen.getDayOfMonth() - lastOpenApp.getDayOfMonth() > 1) {
                             removeBadge();
                         }
+                        appDatabase.getLastOpenAppDao().insert(todayOpen);
                     });
         }
     }
 
+    private void addFirstBadge() {
+        Badge badge = new Badge(1);
+        new Thread(() -> appDatabase.getBadgeDao().insert(badge)).start();
+    }
+
     @SuppressLint("CheckResult")
     private void removeBadge() {
-        Completable.fromAction(() -> appDatabase.getBadgeDao().insert(new Badge(0)))
+        Completable.fromAction(() -> appDatabase.getBadgeDao().insert(new Badge(1)))
                 .subscribeOn(Schedulers.io())
                 .subscribe();
     }
 
     private void addBadge() {
-        Disposable subscribe = appDatabase.getBadgeDao().getBadge().subscribe(new Consumer<Badge>() {
+        new Thread(new Runnable() {
             @Override
-            public void accept(Badge badge) throws Exception {
+            public void run() {
+                Badge badge = appDatabase.getBadgeDao().getBadge();
                 badge.setCount(badge.getCount() + 1);
                 appDatabase.getBadgeDao().insert(badge);
             }
-        });
+        }).start();
+
     }
 
     public AppDatabase getAppDatabase() {

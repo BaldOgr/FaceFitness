@@ -21,6 +21,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import kz.baldogre.learn.App;
+import kz.baldogre.learn.BuildConfig;
 import kz.baldogre.learn.R;
 import kz.baldogre.learn.common.DeveloperKey;
 import kz.baldogre.learn.common.RunOnBackground;
@@ -179,7 +180,9 @@ public class VideosActivity extends YouTubeBaseActivity {
 
         if (index < lessons.size() - 1 &&
                 (mYouTubePlayer.getDurationMillis() <= lessons.get(index).getCurrentMillis()
-                        || index < lastViewedLesson.getLessonId())) {
+                        || index < lastViewedLesson.getLessonId()
+                        || BuildConfig.DEBUG)
+        ) {
             mYouTubePlayer.loadVideo(lessons.get(++index).getLink());
             setDescription();
             pause.setImageResource(R.drawable.ic_play_arrow_black_24dp);
@@ -187,11 +190,9 @@ public class VideosActivity extends YouTubeBaseActivity {
             RunOnBackground.runOnBackground(() -> {
                 appDatabase.getLastViewedDao().insert(lastViewedLesson);
             });
-//            if (index == lessons.size() - 1) {
-//                startActivity(new Intent(this, BadgesActivity.class));
-//            }
         } else if (index == lessons.size() - 1) {
             Toast.makeText(this, R.string.error_not_enough_lessons, Toast.LENGTH_SHORT).show();
+//            startActivity(new Intent(this, BadgesActivity.class));
         } else if (mYouTubePlayer.getDurationMillis() > mYouTubePlayer.getCurrentTimeMillis()) {
             Toast.makeText(this, R.string.error_next_lesson, Toast.LENGTH_SHORT).show();
         }

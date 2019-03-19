@@ -19,7 +19,8 @@
         "currentMillis": 0,
         "passed": false
       }
-    ]
+    ],
+    "isOpen": true
   },
   {
     "id": 2,

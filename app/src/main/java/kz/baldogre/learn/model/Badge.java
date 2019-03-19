@@ -10,9 +10,7 @@ public class Badge {
     private int id = 0;
     private int count;
 
-    public Badge(int id, int count) {
-        this.id = id;
-        this.count = count;
+    public Badge() {
     }
 
     @Ignore
