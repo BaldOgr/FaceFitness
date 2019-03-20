@@ -45,12 +45,15 @@ public class Main2Activity extends AppCompatActivity {
     }
 
     private void initPager() {
-        runOnUiThread(() -> {
-            PageIndicatorView pageIndicatorView = findViewById(R.id.pageIndicatorView);
-            pageIndicatorView.setCount(courses.size()); // specify total count of indicators
-            pageIndicatorView.setSelection(1);
-            mViewPager.setAdapter(mSectionsPagerAdapter);
-            mViewPager.setCurrentItem(1);
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                PageIndicatorView pageIndicatorView = findViewById(R.id.pageIndicatorView);
+                pageIndicatorView.setCount(courses.size() + 1); // specify total count of indicators
+                pageIndicatorView.setSelection(1);
+                mViewPager.setAdapter(mSectionsPagerAdapter);
+                mViewPager.setCurrentItem(1);
+            }
         });
     }
 
@@ -72,7 +75,7 @@ public class Main2Activity extends AppCompatActivity {
 
         @Override
         public int getCount() {
-            return courses.size();
+            return courses.size() + 1;
         }
     }
 }
