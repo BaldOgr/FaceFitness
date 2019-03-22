@@ -11,6 +11,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -59,6 +61,13 @@ public class PlaceholderFragment extends Fragment {
         View rootView;
         if (section == 0) {
             rootView = inflater.inflate(R.layout.fragment_main2, container, false);
+            LinearLayout content = rootView.findViewById(R.id.content);
+            int[] ids = {R.drawable._0, R.drawable._1, R.drawable._2, R.drawable._3, R.drawable.foto1_2};
+            for (int id : ids) {
+                ImageView imageView = new ImageView(rootView.getContext());
+                imageView.setImageResource(id);
+                content.addView(imageView);
+            }
         } else {
             rootView = inflater.inflate(R.layout.fragment_main_lessons, container, false);
         }
@@ -83,7 +92,7 @@ public class PlaceholderFragment extends Fragment {
                                 mStartLessons.setOnClickListener(v -> startActivity(new Intent(getContext(), VideosActivity.class).putExtra(VideosActivity.COURSE_ID, course.getId())));
                             } else {
                                 mStartLessons.setOnClickListener(v -> Toast.makeText(getContext(), R.string.error_closed_course, Toast.LENGTH_SHORT).show());
-                                
+
                             }
                         }
                     });
