@@ -10,6 +10,7 @@
         android:layout_width="96dp"
         android:layout_height="96dp"
         android:layout_below="@id/menu"
+        android:layout_marginTop="8dp"
         android:layout_centerHorizontal="true"
         app:srcCompat="@drawable/ic_logo" />
 
