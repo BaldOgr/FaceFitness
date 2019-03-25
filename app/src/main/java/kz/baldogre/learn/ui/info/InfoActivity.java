@@ -1,7 +1,7 @@
 package kz.baldogre.learn.ui.info;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 
 import butterknife.OnClick;
 import kz.baldogre.learn.R;

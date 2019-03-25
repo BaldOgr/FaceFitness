@@ -1,6 +1,5 @@
 package kz.baldogre.learn.ui.video;
 
-import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;

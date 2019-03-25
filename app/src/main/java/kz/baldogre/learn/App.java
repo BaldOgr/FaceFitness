@@ -11,7 +11,6 @@ import java.util.List;
 
 import io.reactivex.Completable;
 import io.reactivex.schedulers.Schedulers;
-import kz.baldogre.learn.common.Const;
 import kz.baldogre.learn.model.Badge;
 import kz.baldogre.learn.model.Course;
 import kz.baldogre.learn.model.LastOpenApp;
@@ -21,7 +20,7 @@ import kz.baldogre.learn.model.db.AppDatabase;
 
 public class App extends Application {
     AppDatabase appDatabase;
-    private static int DB_VERSION = Const.CURRENT_DB_VERSION;
+    public static int DB_VERSION = 13;
 
     @SuppressLint("CheckResult")
     @Override

@@ -1,13 +1,13 @@
 package kz.baldogre.learn.ui.main;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 
 import com.rd.PageIndicatorView;
 
@@ -19,8 +19,9 @@ import kz.baldogre.learn.App;
 import kz.baldogre.learn.R;
 import kz.baldogre.learn.common.RunOnBackground;
 import kz.baldogre.learn.model.Course;
-import kz.baldogre.learn.ui.info.InfoActivity;
 import kz.baldogre.learn.ui.menu.MenuActivity;
+
+import static kz.baldogre.learn.App.DB_VERSION;
 
 public class Main2Activity extends AppCompatActivity {
 
@@ -39,6 +40,8 @@ public class Main2Activity extends AppCompatActivity {
         ButterKnife.bind(this);
 
         RunOnBackground.runOnBackground(() -> {
+            SharedPreferences sharedPreferences = getSharedPreferences("Lesson", MODE_PRIVATE);
+            while (sharedPreferences.getInt("DB_VERSION", -1) != DB_VERSION);
             courses = ((App) getApplication()).getAppDatabase().getCourseDao().getAllCourses();
             initPager();
         });
