@@ -38,6 +38,7 @@ public class PlaceholderFragment extends Fragment {
     Button mStartLessons;
 
     private Course course;
+    private int section;
 
     public PlaceholderFragment() {
     }
@@ -53,7 +54,7 @@ public class PlaceholderFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        int section = 0;
+        section = 0;
         if (getArguments() != null) {
             section = getArguments().getInt(ARG_SECTION_NUMBER);
         }
@@ -73,13 +74,18 @@ public class PlaceholderFragment extends Fragment {
         }
 
         ButterKnife.bind(this, rootView);
+        return rootView;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
 
         if (mLessonText != null) {
-            int finalSection = section;
             RunOnBackground.runOnBackground(new Runnable() {
                 @Override
                 public void run() {
-                    course = ((App) getActivity().getApplication()).getAppDatabase().getCourseDao().getCourseById(finalSection);
+                    course = ((App) getActivity().getApplication()).getAppDatabase().getCourseDao().getCourseById(section);
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -88,7 +94,7 @@ public class PlaceholderFragment extends Fragment {
                             } else {
                                 mLessonText.setText(Html.fromHtml(course.getDescription().replaceAll("\n", "<br />")));
                             }
-                            if (course.isOpen() || BuildConfig.DEBUG) {
+                            if (course.isOpen()) {
                                 mStartLessons.setOnClickListener(v -> startActivity(new Intent(getContext(), VideosActivity.class).putExtra(VideosActivity.COURSE_ID, course.getId())));
                             } else {
                                 mStartLessons.setOnClickListener(v -> Toast.makeText(getContext(), R.string.error_closed_course, Toast.LENGTH_SHORT).show());
@@ -100,6 +106,5 @@ public class PlaceholderFragment extends Fragment {
             });
         }
 
-        return rootView;
     }
 }

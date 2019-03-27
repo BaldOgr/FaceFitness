@@ -24,6 +24,7 @@ import kz.baldogre.learn.BuildConfig;
 import kz.baldogre.learn.R;
 import kz.baldogre.learn.common.DeveloperKey;
 import kz.baldogre.learn.common.RunOnBackground;
+import kz.baldogre.learn.model.Course;
 import kz.baldogre.learn.model.LastViewedLesson;
 import kz.baldogre.learn.model.Lesson;
 import kz.baldogre.learn.model.db.AppDatabase;
@@ -179,8 +180,7 @@ public class VideosActivity extends YouTubeBaseActivity {
 
         if (index < lessons.size() - 1 &&
                 (mYouTubePlayer.getDurationMillis() <= lessons.get(index).getCurrentMillis()
-                        || index < lastViewedLesson.getLessonId()
-                        || BuildConfig.DEBUG)
+                        || index < lastViewedLesson.getLessonId())
         ) {
             mYouTubePlayer.loadVideo(lessons.get(++index).getLink());
             setDescription();
@@ -191,6 +191,16 @@ public class VideosActivity extends YouTubeBaseActivity {
             });
         } else if (index == lessons.size() - 1) {
             Toast.makeText(this, R.string.error_not_enough_lessons, Toast.LENGTH_SHORT).show();
+            RunOnBackground.runOnBackground(new Runnable() {
+                @Override
+                public void run() {
+                    Course course = appDatabase.getCourseDao().getCourseById(lessons.get(0).getCourseId() + 1);
+                    if (course != null) {
+                        course.setOpen(true);
+                        appDatabase.getCourseDao().insert(course);
+                    }
+                }
+            });
 //            startActivity(new Intent(this, BadgesActivity.class));
         } else if (mYouTubePlayer.getDurationMillis() > mYouTubePlayer.getCurrentTimeMillis()) {
             Toast.makeText(this, R.string.error_next_lesson, Toast.LENGTH_SHORT).show();
